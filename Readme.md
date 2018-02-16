@@ -1,4 +1,4 @@
-# BlocXus (Block Nexus)
+# BlocXus (Bloc Nexus)
  
 > BlocXus - The tiny module written by AlexStrNik, which realises simplest blockchain.
 
