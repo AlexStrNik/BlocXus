@@ -1,0 +1,39 @@
+{
+  "name": "blocxus",
+  "version": "1.0.0",
+  "description": "BlocXus (Bloc Nexus) - The tiny module written by AlexStrNik, which realises simplest blockchain. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexStrNik/BlocXus.git"
+  },
+  "keywords": [
+    "blockchain",
+    "block",
+    "chain",
+    "tiny",
+    "blocxus",
+    "nexus"
+  ],
+  "author": "AlexStrNik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlexStrNik/BlocXus/issues"
+  },
+  "homepage": "https://github.com/AlexStrNik/BlocXus#readme",
+  "dependencies": {
+    "node-localdb": "0.0.3",
+    "peer-exchange": "^2.2.0"
+  },
+  "devDependencies": {
+    "cli-table2": "^0.2.0",
+    "inquirer": "^5.1.0",
+    "inquirer-command-prompt": "0.0.7",
+    "vorpal": "^1.12.0",
+    "wrtc": "0.0.66",
+    "colors": "latest"
+  }
+}
