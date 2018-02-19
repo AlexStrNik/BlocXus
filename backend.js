@@ -106,7 +106,10 @@ class Node{
     };
     async mineBlock(data){
         let block = await this.blocks.mineBlock(data);
-        this.broadcast({type:"BLOCK",block:block})
+        this.broadcast({type:"BLOCK",block:block});
+        if(this.onUpdate){
+            this.onUpdate({type:"MINED",block:block});
+        }
     };
     async connectToNode(nodeInfo){
         let socket = net.connect(nodeInfo.port, nodeInfo.ip, () => this.ex.connect(socket,(err,connection)=>{

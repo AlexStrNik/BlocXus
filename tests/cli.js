@@ -1,4 +1,5 @@
-let blocxus = require('./../backend');
+#!/usr/bin/env node
+let blocxus = require('blocxus');
 const vorpal = require('vorpal')();
 const colors = require('colors/safe');
 const Table = require('cli-table2');
@@ -8,14 +9,44 @@ blocxus.onUpdate = function (update) {
         const table = new Table({
             style:{border:[],header:[]},
             wordWrap: true,
-            colWidths:[20,20]
+            colWidths:[30,30]
         });
-        table.push([{colSpan:2,content:colors.green.bold("New Block"), hAlign:'center'}]);
-        table.push(update.blocks.previous);
+        table.push([{colSpan:2,content:colors.green.bold("New Block #"+update.blocks.previous.id), hAlign:'center'}]);
+        let obj = {};
+        obj[`id`] = update.blocks.previous.id;
+        obj[`hash`] = update.blocks.previous.hash;
+        obj[`previous hash`] = update.blocks.previous.pHash;
+        for(let k in obj){
+            table.push([k,obj[k]])
+        }
+        table.push([{colSpan:2,content:colors.green.bold("Block Data"), hAlign:'center'}]);
+        for(let k in update.blocks.previous.data){
+            table.push([k,update.blocks.previous.data[k]])
+        }
+        vorpal.log(table.toString());
+    }
+    if(update.type==="MINED"){
+        const table = new Table({
+            style:{border:[],header:[]},
+            wordWrap: true,
+            colWidths:[30,30]
+        });
+        table.push([{colSpan:2,content:colors.green.bold("Mined Block #"+update.block.id), hAlign:'center'}]);
+        let obj = {};
+        obj[`id`] = update.block.id;
+        obj[`hash`] = update.block.hash;
+        obj[`previous hash`] = update.block.pHash;
+        for(let k in obj){
+            table.push([k,obj[k]])
+        }
+        table.push([{colSpan:2,content:colors.green.bold("Block Data"), hAlign:'center'}]);
+        for(let k in update.block.data){
+            table.push([k,update.block.data[k]])
+        }
         vorpal.log(table.toString());
     }
     if(update.type==="PEER"){
-        vorpal.log(update.peer);
+        vorpal.log(update.peer.host);
     }
 };
 
