@@ -1,6 +1,6 @@
 {
   "name": "blocxus",
-  "version": "1.2.1",
+  "version": "1.2.666",
   "description": "BlocXus (Bloc Nexus) - The tiny module written by AlexStrNik, which realises simplest blockchain. ",
   "main": "index.js",
   "scripts": {
@@ -26,8 +26,9 @@
   "homepage": "https://github.com/AlexStrNik/BlocXus#readme",
   "dependencies": {
     "external-ip": "^1.3.1",
+    "internal-ip": "^3.0.1",
+    "nat-pmp": "^1.0.0",
     "nat-upnp": "^1.1.1",
-    "node-localdb": "0.0.3",
-    "peer-exchange": "^2.2.0"
+    "node-localdb": "0.0.3"
   }
 }
