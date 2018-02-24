@@ -66,4 +66,4 @@ let start = function () {
 // socket configuration
 // bind socket
 
-vorpal.use(connect).use(start);
+vorpal.use(connect).use(start).delimiter('blocxus~$').show();
