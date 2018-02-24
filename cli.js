@@ -3,7 +3,6 @@ const UdpHolePuncher = require('udp-hole-puncher');
 const stun = require('vs-stun');
 const vorpal = require('vorpal')();
 // eslint-disable-next-line import/no-extraneous-dependencies
-
 let lPort;
 let connect = vorpal.command('connect <host> <port>', "Connect to a new peer. Eg: connect localhost 2727",{})
     .alias('c')
