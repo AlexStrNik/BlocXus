@@ -32,6 +32,10 @@
     "nat-upnp": "^1.1.1",
     "network": "^0.4.1",
     "node-localdb": "^0.0.3",
+    "udp-hole-puncher": "^1.0.2",
     "vs-stun": "0.0.7"
+  },
+  "devDependencies": {
+    "vorpal": "^1.12.0"
   }
 }
