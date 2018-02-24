@@ -4,10 +4,14 @@ const stun = require('vs-stun');
 const vorpal = require('vorpal')();
 // eslint-disable-next-line import/no-extraneous-dependencies
 
+let lPort;
 let connect = vorpal.command('connect <host> <port>', "Connect to a new peer. Eg: connect localhost 2727",{})
     .alias('c')
     .action(function(argv, callback) {
         if(argv.host && argv.port) {
+            const dataMessages = 10;
+            const socket = dgram.createSocket('udp4');
+
             const sendData = () => {
                 for (let i = 0; i < dataMessages; i += 1) {
                     const data = `message ${i}`;
@@ -39,6 +43,8 @@ let connect = vorpal.command('connect <host> <port>', "Connect to a new peer. Eg
                 });
                 puncher.connect(argv.host, argv.port);
             });
+
+            socket.bind(lPort);
         }
         callback();
     });
@@ -50,19 +56,15 @@ let start = function () {
         if ( !error ) {
             socket = value;
             console.log(socket.stun);
+            lPort = socket.stun.local.port;
             socket.close();
         }
     };
     stun.connect(server, callback);
 };
 
-const dataMessages = 10;
-
-// create new socket
-const socket = dgram.createSocket('udp4');
 // send data
 // socket configuration
 // bind socket
-socket.bind();
 
 vorpal.use(connect).use(start);
