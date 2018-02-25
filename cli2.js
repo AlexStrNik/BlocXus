@@ -17,7 +17,7 @@ const client = {
 const udp_in = dgram.createSocket('udp4');
 
 const getNetworkIP = function (callback) {
-    const socket = net.createConnection(80, rendezvous.address);
+    const socket = net.createConnection(rendezvous.port, rendezvous.address);
     socket.on('connect', function () {
         callback(undefined, socket.address().address);
         socket.end();
