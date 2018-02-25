@@ -56,6 +56,9 @@ let start = function () {
                 puncher.on('error', (error) => {
                     console.log(`woops, something went wrong: ${error}`);
                 });
+                puncher.on('reachable', () => {
+                    console.log(`woohoo, now we are reachable`);
+                });
                 dd.puncher = puncher;
             });
             socket.bind(lPort);
