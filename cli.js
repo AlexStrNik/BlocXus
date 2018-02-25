@@ -36,31 +36,34 @@ let start = function () {
             console.log(socket2.stun);
             lPort = socket2.stun.local.port;
             socket2.close();
+
+            //end stun
+
+            const socket = dgram.createSocket('udp4');
+            socket.on('error', (error) => {
+                console.error(`socket error:\n${error.stack}`);
+                socket.close();
+            });
+            socket.on('message', (message, rinfo) => {
+                const data = message.toString();
+                console.log(`receiving ${data} from ${rinfo.address}:${rinfo.port}`);
+            });
+            socket.on('listening', () => {
+                const address = socket.address();
+                console.log(`listening at ${address.address}:${address.port}`);
+                // puncher configuration
+                const puncher = new UdpHolePuncher(socket);
+                puncher.on('error', (error) => {
+                    console.log(`woops, something went wrong: ${error}`);
+                });
+                dd.puncher = puncher;
+            });
+            socket.bind(lPort);
+            dd.socket = socket;
         }
     };
     stun.connect(server, callback);
     //end stun
-    const socket = dgram.createSocket('udp4');
-    socket.on('error', (error) => {
-        console.error(`socket error:\n${error.stack}`);
-        socket.close();
-    });
-    socket.on('message', (message, rinfo) => {
-        const data = message.toString();
-        console.log(`receiving ${data} from ${rinfo.address}:${rinfo.port}`);
-    });
-    socket.on('listening', () => {
-        const address = socket.address();
-        console.log(`listening at ${address.address}:${address.port}`);
-        // puncher configuration
-        const puncher = new UdpHolePuncher(socket);
-        puncher.on('error', (error) => {
-            console.log(`woops, something went wrong: ${error}`);
-        });
-        dd.puncher = puncher;
-    });
-    socket.bind(lPort);
-    dd.socket = socket;
 };
 
 // send data
