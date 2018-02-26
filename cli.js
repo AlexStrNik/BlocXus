@@ -39,52 +39,6 @@ let start = function () {
             console.log(socket2.stun);
             lPort = socket2.stun.local.port;
             socket2.close();
-
-            let protocols = ['udp', 'tcp'];
-            let upnpClient = natUpnp.createClient();
-            let pmpClient = pmp.connect((await gateway.v4()).gateway||(await gateway.v6()).gateway);
-            protocols.forEach(function(protocol) {
-                upnpClient.portMapping({
-                    public: socket2.stun.public.port,
-                    private: socket2.stun.local.port,
-                    protocol: protocol,
-                    description: 'Blocxus',
-                    ttl: 0 // Unlimited, since most routers doesn't support other value
-                }, function(err) {});
-                pmpClient.portMapping({
-                    private: socket2.stun.local.port,
-                    public: socket2.stun.public.port,
-                    description: 'Blocxus',
-                    type: protocol,
-                    ttl: 60 * 30
-                }, function(err) {});
-            });
-            //end stun
-
-            const socket = dgram.createSocket('udp4');
-            socket.on('error', (error) => {
-                console.error(`socket error:\n${error.stack}`);
-                socket.close();
-            });
-            socket.on('message', (message, rinfo) => {
-                const data = message.toString();
-                console.log(`receiving ${data} from ${rinfo.address}:${rinfo.port}`);
-            });
-            socket.on('listening', () => {
-                const address = socket.address();
-                console.log(`listening at ${address.address}:${address.port}`);
-                // puncher configuration
-                const puncher = new UdpHolePuncher(socket);
-                puncher.on('error', (error) => {
-                    console.log(`woops, something went wrong: ${error}`);
-                });
-                puncher.on('reachable', () => {
-                    console.log(`woohoo, now we are reachable`);
-                });
-                dd.puncher = puncher;
-            });
-            socket.bind(lPort);
-            dd.socket = socket;
         }
     };
     stun.connect(server, callback);

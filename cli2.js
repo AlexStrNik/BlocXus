@@ -1,5 +1,6 @@
 const dgram = require('dgram');
 const net = require('net');
+const stun = require('vs-stun');
 
 let clientName = process.argv[4];
 let remoteName = process.argv[5];
@@ -17,14 +18,17 @@ const client = {
 const udp_in = dgram.createSocket('udp4');
 
 const getNetworkIP = function (callback) {
-    const socket = net.createConnection(rendezvous.port, rendezvous.address);
-    socket.on('connect', function () {
-        callback(undefined, socket.address().address);
-        socket.end();
-    });
-    socket.on('error', function (e) {
-        callback(e, 'error');
-    });
+    let server = { host: 'stun.l.google.com', port: 19302 };
+    let socket2 = {host: '127.0.0.1', port: 12345};
+    let callbacks = async function ( error, value ) {
+        if ( !error ) {
+            socket2 = value;
+            callback(undefined,socket2.stun.local.host);
+            socket2.close();
+        }
+    };
+    stun.connect(server, callbacks);
+
 };
 
 const send = function (connection, msg, cb) {
@@ -44,7 +48,7 @@ const send = function (connection, msg, cb) {
 udp_in.on("listening", function() {
     const linfo = {port: udp_in.address().port};
     getNetworkIP(function(error, ip) {
-        if (error) return console.log("! Unable to obtain connection information!");
+        if (error) return console.log("! Unable to obtain connection information! "+error);
         linfo.address = ip;
         console.log('# listening as %s@%s:%s', clientName, linfo.address, linfo.port);
         send(rendezvous, { type: 'register', name: clientName, linfo: linfo }, function() {
