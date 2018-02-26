@@ -36,8 +36,8 @@ const send = function (connection, msg, cb) {
 
     udp_in.send(data, 0, data.length, connection.port, connection.address, function (err, bytes) {
         if (err) {
-            udp_in.close();
-            console.log('# stopped due to error: %s', err);
+            //udp_in.close();
+            //console.log('# stopped due to error: %s', err);
         } else {
             console.log('# sent %s to %s:%s', msg.type, connection.address, connection.port);
             if (cb) cb();
@@ -73,7 +73,10 @@ udp_in.on('message', function(data, rinfo) {
         const punch = {type: 'punch', from: clientName, to: remoteName};
         for (let con in data.client.connections) {
             doUntilAck(1000, function() {
-                send(data.client.connections[con], punch);
+                try{
+                    send(data.client.connections[con], punch);
+                }
+                catch (e){}
             });
         }
     } else if (data.type === 'punch' && data.to === clientName) {
@@ -102,5 +105,4 @@ let doUntilAck = function(interval, fn) {
         doUntilAck(interval, fn);
     }, interval);
 };
-
 udp_in.bind();
