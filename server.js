@@ -1,5 +1,4 @@
 let dgram = require('dgram');
-let http = require('http');
 let udp_matchmaker = dgram.createSocket('udp4');
 let udp_port = process.env.PORT;
 
@@ -54,4 +53,3 @@ let send = function(host, port, msg, cb) {
     });
 };
 udp_matchmaker.bind(udp_port);
-http.createServer().listen(udp_port);
