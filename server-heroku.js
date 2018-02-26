@@ -53,5 +53,5 @@ let send = function(host, port, msg, cb) {
         }
     });
 };
-http.createServer().listen(udp_port);
 udp_matchmaker.bind(udp_port);
+http.createServer().listen(udp_port);
