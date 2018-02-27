@@ -47,7 +47,7 @@ let send = function(host, port, msg, cb) {
             udp_matchmaker.close();
             console.log('# stopped due to error: %s', err);
         } else {
-            console.log('# sent '+msg.type);
+            console.log('# sent '+msg.type+' to: [%s:%s]',host,port);
             if (cb) cb();
         }
     });
