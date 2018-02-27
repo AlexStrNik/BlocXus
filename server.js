@@ -29,6 +29,7 @@ udp_matchmaker.on('message', function(data, rinfo) {
             type: 'connection',
             client: clients['AlexStrNik']
         });
+
         console.log('# Client registered: %s@[%s:%s | %s:%s]', data.name,
             rinfo.address, rinfo.port, data.linfo.address, data.linfo.port);
     } else if (data.type === 'connect') {
