@@ -111,7 +111,7 @@ udp_in.on('message', function(data, rinfo) {
         console.log('! Couldn\'t parse data(%s):\n%s', e, data);
         return;
     }
-    if (data.type === 'connection') {
+    if (data.type == 'connection') {
         console.log('# connecting with %s@[%s:%s | %s:%s]', data.client.name,
             data.client.connections.local.address, data.client.connections.local.port, data.client.connections.public.address, data.client.connections.public.port);
         remoteName = data.client.name;
@@ -124,11 +124,11 @@ udp_in.on('message', function(data, rinfo) {
                 catch (e){}
             });
         }
-    } else if (data.type === 'punch' && data.to === clientName) {
+    } else if (data.type == 'punch' && data.to === clientName) {
         const ack = {type: 'ack', from: clientName};
         console.log("# got punch, sending ACK");
         send(rinfo, ack);
-    } else if (data.type === 'ack' && !client.ack) {
+    } else if (data.type == 'ack' && !client.ack) {
         client.ack = true;
         client.connection = rinfo;
         console.log("# got ACK, sending MSG");
@@ -137,8 +137,11 @@ udp_in.on('message', function(data, rinfo) {
             from: clientName,
             msg: 'Hello World, '+remoteName+'!'
         });
-    } else if (data.type === 'message') {
+    } else if (data.type == 'message') {
         console.log('> %s [from %s@%s:%s]', data.msg, data.from, rinfo.address, rinfo.port)
+    }
+    else {
+        console.log(data);
     }
 });
 
