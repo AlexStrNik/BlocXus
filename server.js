@@ -15,7 +15,7 @@ udp_matchmaker.on('message', function(data, rinfo) {
     } catch (e) {
         return console.log('! Couldn\'t parse data (%s):\n%s', e, data);
     }
-    if (data.type === 'register') {
+    if (data.type == 'register') {
         clients[data.name] = {
             name: data.name,
             connections: {
@@ -24,15 +24,9 @@ udp_matchmaker.on('message', function(data, rinfo) {
             }
         };
         send(rinfo.address,rinfo.port,{type:'message',msg:'# You are registered'});
-        send(rinfo.address,rinfo.port,{type:'message',msg:'# You are registered'});
-        send(rinfo.address, rinfo.port, {
-            type: 'connection',
-            client: clients['AlexStrNik']
-        });
 
-        console.log('# Client registered: %s@[%s:%s | %s:%s]', data.name,
-            rinfo.address, rinfo.port, data.linfo.address, data.linfo.port);
-    } else if (data.type === 'connect') {
+        console.log('# Client registered: %s@[%s:%s | %s:%s]', data.name, rinfo.address, rinfo.port, data.linfo.address, data.linfo.port);
+    } else if (data.type == 'connect') {
         let couple = [ clients[data.from], clients[data.to] ];
         for (let i=0; i<couple.length; i++) {
             if (!couple[i]) return console.log('Client unknown!');
