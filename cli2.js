@@ -1,10 +1,12 @@
 const dgram = require('dgram');
 const net = require('net');
 const stun = require('vs-stun');
+const pmp = require('nat-pmp');
+const natUpnp = require('nat-upnp');
+const gateway = require('default-gateway');
 
 let clientName = process.argv[4];
 let remoteName = process.argv[5];
-
 const rendezvous = {
     address: process.argv[2],
     port: process.argv[3]
@@ -31,6 +33,20 @@ const getNetworkIP = function (callback) {
 
 };
 
+const getNetworkPort = function (callback) {
+    let server = { host: 'stun.l.google.com', port: 19302 };
+    let socket2 = {host: '127.0.0.1', port: 12345};
+    let callbacks = async function ( error, value ) {
+        if ( !error ) {
+            socket2 = value;
+            callback(undefined,socket2.stun.local.port);
+            socket2.close();
+        }
+    };
+    stun.connect(server, callbacks);
+
+};
+
 const send = function (connection, msg, cb) {
     const data = new Buffer(JSON.stringify(msg));
 
@@ -47,13 +63,42 @@ const send = function (connection, msg, cb) {
 
 udp_in.on("listening", function() {
     const linfo = {port: udp_in.address().port};
-    getNetworkIP(function(error, ip) {
+    getNetworkIP(async function(error, ip) {
         if (error) return console.log("! Unable to obtain connection information! "+error);
+
+        let upnpClient = natUpnp.createClient();
+        let pmpClient = pmp.connect((await gateway.v4()).gateway||(await gateway.v6()).gateway);
+        let protocols = ['udp', 'tcp'];
+        let server = { host: 'stun.l.google.com', port: 19302 };
+        let socket2 = {host: '127.0.0.1', port: 12345};
+        let callbacks = async function ( error, value ) {
+            if ( !error ) {
+                let socket = value;
+                protocols.forEach(function(protocol) {
+                    upnpClient.portMapping({
+                        public: socket.stun.public.port,
+                        private: socket.stun.local.port,
+                        protocol: protocol,
+                        description: 'Blocxus',
+                        ttl: 0 // Unlimited, since most routers doesn't support other value
+                    }, function(err) {});
+                    pmpClient.portMapping({
+                        private: socket.stun.local.port,
+                        public: socket.stun.public.port,
+                        description: 'Blocxus',
+                        type: protocol,
+                        ttl: 60 * 30
+                    }, function(err) {});
+                });
+            }
+        };
+        stun.connect(server, callbacks);
+
         linfo.address = ip;
         console.log('# listening as %s@%s:%s', clientName, linfo.address, linfo.port);
         send(rendezvous, { type: 'register', name: clientName, linfo: linfo }, function() {
             if (remoteName) {
-                send(rendezvous, { type: 'connect', from: clientName, to: remoteName });
+                send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
             }
         });
     });
@@ -105,4 +150,8 @@ let doUntilAck = function(interval, fn) {
         doUntilAck(interval, fn);
     }, interval);
 };
-udp_in.bind();
+getNetworkPort((error,port)=>{
+    if (error) return console.log("! Unable to obtain connection information! "+error);
+    udp_in.bind(port);
+});
+
