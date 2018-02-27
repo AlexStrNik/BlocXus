@@ -25,6 +25,10 @@ udp_matchmaker.on('message', function(data, rinfo) {
         };
         send(rinfo.address,rinfo.port,{type:'message',msg:'# You are registered'});
         send(rinfo.address,rinfo.port,{type:'message',msg:'# You are registered'});
+        send(rinfo.address, rinfo.port, {
+            type: 'connection',
+            client: 'klkll'
+        });
         console.log('# Client registered: %s@[%s:%s | %s:%s]', data.name,
             rinfo.address, rinfo.port, data.linfo.address, data.linfo.port);
     } else if (data.type === 'connect') {
