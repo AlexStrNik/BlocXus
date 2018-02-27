@@ -39,7 +39,7 @@ const getNetworkPort = function (callback) {
     let callbacks = async function ( error, value ) {
         if ( !error ) {
             socket2 = value;
-            callback(undefined,socket2.stun.local.port);
+            callback(undefined,socket2.stun.public.port);
             socket2.close();
         }
     };
@@ -77,13 +77,13 @@ udp_in.on("listening", function() {
                 protocols.forEach(function(protocol) {
                     upnpClient.portMapping({
                         public: socket.stun.public.port,
-                        private: socket.stun.local.port,
+                        private: socket.stun.public.port,
                         protocol: protocol,
                         description: 'Blocxus',
                         ttl: 0 // Unlimited, since most routers doesn't support other value
                     }, function(err) {});
                     pmpClient.portMapping({
-                        private: socket.stun.local.port,
+                        private: socket.stun.public.port,
                         public: socket.stun.public.port,
                         description: 'Blocxus',
                         type: protocol,
