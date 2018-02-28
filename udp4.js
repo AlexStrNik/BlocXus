@@ -157,6 +157,8 @@ let doUntilAck = function(interval, fn) {
     }, interval);
 };
 
+
+module.exports = {};
 module.exports.init = (rendez_host,rendez_port,client_name)=>{
     rendezvous = {
         address : rendez_host,
