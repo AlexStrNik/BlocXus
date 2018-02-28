@@ -81,7 +81,7 @@ udp_in.on('message', async function(data, rinfo) {
     }
     if (data.type == 'connection') {
         console.log('# connecting with %s@[%s:%s | %s:%s]', data.client.name,
-            data.client.connections.local.address, data.client.connections.local.port, data.client.connections.public.address, data.client.connections.public.port);
+            data.client.connections.public.address, data.client.connections.local.port, data.client.connections.public.address, data.client.connections.public.port);
         remoteName = data.client.name;
         let conns = [{address:data.client.connections.public.address,port:data.client.connections.public.port},{address:data.client.connections.public.address,port:data.client.connections.local.port}];
         const punch = {type: 'punch', from: clientName, to: remoteName};
