@@ -37,6 +37,10 @@ udp_matchmaker.on('message', function(data, rinfo) {
                 type: 'connection',
                 client: couple[(i+1)%couple.length],
             });
+            send(couple[i].connections.public.address, couple[i].connections.local.port, {
+                type: 'connection',
+                client: couple[(i+1)%couple.length],
+            });
         }
     }
 });
