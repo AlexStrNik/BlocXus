@@ -53,7 +53,7 @@ const send = function (connection, msg, cb) {
     udp_in.send(data, 0, data.length, connection.port, connection.address, function (err, bytes) {
         if (err) {
             //udp_in.close();
-            //console.log('# stopped due to error: %s', err);
+            console.log('# stopped due to error: %s', err);
         } else {
             console.log('# sent %s to %s:%s', msg.type, connection.address, connection.port);
             if (cb) cb();
@@ -97,9 +97,6 @@ udp_in.on("listening", function() {
         linfo.address = ip;
         console.log('# listening as %s@%s:%s', clientName, linfo.address, linfo.port);
         send(rendezvous, { type: 'register', name: clientName, linfo: linfo }, function() {
-            if (remoteName) {
-                send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
-            }
         });
     });
 });
@@ -139,6 +136,12 @@ udp_in.on('message', function(data, rinfo) {
         });
     } else if (data.type == 'message') {
         console.log('> %s [from %s@%s:%s]', data.msg, data.from, rinfo.address, rinfo.port)
+    }
+    else if(data.type == 'registered'){
+        if (remoteName) {
+            send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
+        }
+        console.log(data.msg);
     }
     else {
         console.log(data);
