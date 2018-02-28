@@ -5,12 +5,8 @@ const pmp = require('nat-pmp');
 const natUpnp = require('nat-upnp');
 const gateway = require('default-gateway');
 
-let clientName = process.argv[4];
-let remoteName = process.argv[5];
-const rendezvous = {
-    address: process.argv[2],
-    port: process.argv[3]
-};
+let clientName;
+let rendezvous;
 
 const client = {
     ack: false,
@@ -33,17 +29,32 @@ const getNetworkIP = function (callback) {
 
 };
 
-const getNetworkPort = function (callback) {
+const getPublicIP = function () {
     let server = { host: 'stun.l.google.com', port: 19302 };
     let socket2 = {host: '127.0.0.1', port: 12345};
     let callbacks = async function ( error, value ) {
         if ( !error ) {
             socket2 = value;
-            callback(undefined,socket2.stun.public.port);
+            callback(undefined,socket2.stun.public.host);
             socket2.close();
         }
     };
     stun.connect(server, callbacks);
+
+};
+
+const getNetworkPort = async function () {
+    let server = { host: 'stun.l.google.com', port: 19302 };
+    let socket2 = {host: '127.0.0.1', port: 12345};
+    let callbacks = async function ( error, value ) {
+        if ( !error ) {
+            socket2 = value;
+            let pp = socket2.stun.public.port;
+            socket2.close();
+            return pp;
+        }
+    };
+    await stun.connect(server, callbacks);
 
 };
 
@@ -82,7 +93,7 @@ udp_in.on('message', async function(data, rinfo) {
     if (data.type == 'connection') {
         console.log('# connecting with %s@[%s:%s | %s:%s]', data.client.name,
             data.client.connections.public.address, data.client.connections.local.port, data.client.connections.public.address, data.client.connections.public.port);
-        remoteName = data.client.name;
+        let remoteName = data.client.name;
         let conns = [{address:data.client.connections.public.address,port:data.client.connections.public.port},{address:data.client.connections.public.address,port:data.client.connections.local.port}];
         const punch = {type: 'punch', from: clientName, to: remoteName};
         for (let con in conns) {
@@ -130,9 +141,6 @@ udp_in.on('message', async function(data, rinfo) {
                 ttl: 60 * 30
             }, function(err) {});
         });
-        if (remoteName) {
-            send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
-        }
         console.log(data.msg);
     }
     else {
@@ -148,8 +156,18 @@ let doUntilAck = function(interval, fn) {
         doUntilAck(interval, fn);
     }, interval);
 };
-getNetworkPort((error,port)=>{
-    if (error) return console.log("! Unable to obtain connection information! "+error);
-    udp_in.bind(port);
-});
 
+module.exports.init = (rendez_host,rendez_port,client_name)=>{
+    rendezvous = {
+        address : rendez_host,
+        port : rendez_port
+    };
+    clientName = client_name;
+    getNetworkPort((error,port)=>{
+        if (error) return console.log("! Unable to obtain connection information! "+error);
+        udp_in.bind(port);
+    });
+};
+module.exports.ip = getPublicIP;
+module.exports.udp = udp_in;
+module.exports.connect = (remoteName)=>send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
