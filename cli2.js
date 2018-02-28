@@ -65,35 +65,6 @@ udp_in.on("listening", function() {
     const linfo = {port: udp_in.address().port};
     getNetworkIP(async function(error, ip) {
         if (error) return console.log("! Unable to obtain connection information! "+error);
-
-        let upnpClient = natUpnp.createClient();
-        let pmpClient = pmp.connect((await gateway.v4()).gateway||(await gateway.v6()).gateway);
-        let protocols = ['udp', 'tcp'];
-        let server = { host: 'stun.l.google.com', port: 19302 };
-        let socket2 = {host: '127.0.0.1', port: 12345};
-        let callbacks = async function ( error, value ) {
-            if ( !error ) {
-                let socket = value;
-                protocols.forEach(function(protocol) {
-                    upnpClient.portMapping({
-                        public: socket.stun.public.port,
-                        private: socket.stun.public.port,
-                        protocol: protocol,
-                        description: 'Blocxus',
-                        ttl: 0 // Unlimited, since most routers doesn't support other value
-                    }, function(err) {});
-                    pmpClient.portMapping({
-                        private: socket.stun.public.port,
-                        public: socket.stun.public.port,
-                        description: 'Blocxus',
-                        type: protocol,
-                        ttl: 60 * 30
-                    }, function(err) {});
-                });
-            }
-        };
-        stun.connect(server, callbacks);
-
         linfo.address = ip;
         console.log('# listening as %s@%s:%s', clientName, linfo.address, linfo.port);
         send(rendezvous, { type: 'register', name: clientName, linfo: linfo }, function() {
@@ -101,7 +72,7 @@ udp_in.on("listening", function() {
     });
 });
 
-udp_in.on('message', function(data, rinfo) {
+udp_in.on('message', async function(data, rinfo) {
     try {
         data = JSON.parse(data);
     } catch (e) {
@@ -138,6 +109,26 @@ udp_in.on('message', function(data, rinfo) {
         console.log('> %s [from %s@%s:%s]', data.msg, data.from, rinfo.address, rinfo.port)
     }
     else if(data.type == 'registered'){
+
+        let upnpClient = natUpnp.createClient();
+        let pmpClient = pmp.connect((await gateway.v4()).gateway||(await gateway.v6()).gateway);
+        let protocols = ['udp', 'tcp'];
+        protocols.forEach(function(protocol) {
+            upnpClient.portMapping({
+                public: data.client.connections.public.port,
+                private: data.client.connections.local.port,
+                protocol: protocol,
+                description: 'Blocxus',
+                ttl: 0 // Unlimited, since most routers doesn't support other value
+            }, function(err) {});
+            pmpClient.portMapping({
+                private: data.client.connections.public.port,
+                public: data.client.connections.local.port,
+                description: 'Blocxus',
+                type: protocol,
+                ttl: 60 * 30
+            }, function(err) {});
+        });
         if (remoteName) {
             send(rendezvous, {type: 'connect', from: clientName, to: remoteName});
         }
