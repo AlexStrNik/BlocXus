@@ -1,6 +1,6 @@
 {
   "name": "blocxus",
-  "version": "1.5.8",
+  "version": "2.0.0",
   "description": "BlocXus (Bloc Nexus) - The tiny module written by AlexStrNik, which realises simplest blockchain. ",
   "main": "server-heroku.js",
   "scripts": {

@@ -43,10 +43,10 @@ class Blockchain{
         if(block.id<=this.previous.id){
             return "ERR"
         }
-        if(block.id===this.previous.id){
+        if(block.id==this.previous.id){
             return "HMM"
         }
-        if(block.pHash===this.previous.hash){
+        if(block.pHash==this.previous.hash){
             await this.addBlock(block);
             return "NEXT"
         }
@@ -58,7 +58,7 @@ class Blockchain{
         if(chain.length <= await this.blocks.count({})){
             return "ERR"
         }
-        if(chain.length === await this.blocks.count({})){
+        if(chain.length == await this.blocks.count({})){
             return "HMM"
         }
         this.blocks._flush(chain);
