@@ -144,7 +144,8 @@ class udp4{
                 console.log(data.msg);
             }
             else {
-                console.log(data);
+                //console.log(data);
+                //console.log(self.client);
             }
         });
         this.getNetworkPort((error,port)=> {
